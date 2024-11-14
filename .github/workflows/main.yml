@@ -1,46 +1,57 @@
-name: "TF2C Build"
-on: push
+name: TF2CDownloader Build CI
+
+on:
+  workflow_dispatch:
+  push:
+  pull_request:
 
 jobs:
-  export-windows:
-    name: Windows Export
+  build-windows:
+    name: Build Windows
     runs-on: windows-latest
     steps:
-      - name: Checkout main repo
-        uses: actions/checkout@v2
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Setup environment
         run: |
           pip install zstd rich httpx tqdm pyinstaller python-gettext
+
       - name: Do localisations
         run: |
           ./GenerateMO.sh
         shell: bash
-      - name: Build Windows
+
+      - name: Build Windows version
         run: |
           .\CompileWindows
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v1
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
         with:
           name: windows
           path: dist/tf2c_downloader.exe
-  export-linux:
-    name: Linux Export
-    runs-on: ubuntu-20.04
+
+  build-linux:
+    name: Build Linux
+    runs-on: ubuntu-latest
     steps:
-      - name: Checkout main repo
-        uses: actions/checkout@v2
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Setup environment
         run: |
           sudo apt-get update
           sudo apt-get install gettext
           pip install zstd rich httpx tqdm pyinstaller
-      - name: Build Linux
+
+      - name: Build Linux version
         run: |
           ./GenerateMO.sh
           ./CompileLinux.sh
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v1
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
         with:
           name: linux
           path: dist/tf2c_downloader
-          
